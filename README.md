@@ -24,7 +24,6 @@ Forty beautiful duas from the Qur'an — a Flutter app built with GetX.
 - Search by meaning, number, or surah
 - Save favorites
 - Copy a dua to the clipboard
-- Light and dark themes
 
 ## Getting Started
 
