@@ -1,17 +1,34 @@
-# rabbana_flutter
+# 40 Rabbana
 
-40 Rabbana Duas App
+Forty beautiful duas from the Qur'an — a Flutter app built with GetX.
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/splash.png" alt="Splash screen" width="250" />
+  &nbsp;&nbsp;
+  <img src="screenshots/home.png" alt="Home screen with list of duas" width="250" />
+  &nbsp;&nbsp;
+  <img src="screenshots/dua_detail.png" alt="Dua detail screen with audio player" width="250" />
+</p>
+
+<p align="center">
+  <b>Splash</b> &nbsp;·&nbsp; <b>Home</b> &nbsp;·&nbsp; <b>Dua detail</b>
+</p>
+
+## Features
+
+- All 40 Rabbana duas with Arabic text, transliteration and English meaning
+- Surah and ayah reference for each dua
+- Listen to the Arabic recitation
+- Search by meaning, number, or surah
+- Save favorites
+- Copy a dua to the clipboard
+- Light and dark themes
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
+```
