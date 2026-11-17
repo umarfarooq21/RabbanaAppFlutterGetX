@@ -2,10 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../controllers/settings_controller.dart';
 import '../../../models/rabbana_dua.dart';
 import '../../../theme/app_colors.dart';
+import '../../../theme/app_palette.dart';
 
 class DuaAudioPlayer extends StatefulWidget {
   const DuaAudioPlayer({super.key, required this.dua});
@@ -29,6 +32,15 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
   String? _error;
 
   String get _spokenArabic => widget.dua.arabic.trim();
+
+  double get _speechRate =>
+      Get.find<SettingsController>().recitationSpeed.value.rate;
+
+  /// Speaks the dua using the user's current recitation speed.
+  Future<void> _speak() async {
+    await _tts.setSpeechRate(_speechRate);
+    await _tts.speak(_spokenArabic);
+  }
 
   @override
   void initState() {
@@ -122,7 +134,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
 
       await _tts.awaitSpeakCompletion(true);
       await _tts.setLanguage('ar-SA');
-      await _tts.setSpeechRate(0.42);
+      await _tts.setSpeechRate(_speechRate);
       await _tts.setPitch(1.0);
       await _tts.setVolume(1.0);
 
@@ -135,9 +147,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
         }).toList();
         if (arabicVoices.isNotEmpty) {
           final preferred = Map<String, String>.from(
-            arabicVoices.first.map(
-              (key, value) => MapEntry('$key', '$value'),
-            ),
+            arabicVoices.first.map((key, value) => MapEntry('$key', '$value')),
           );
           await _tts.setVoice(preferred);
         }
@@ -167,13 +177,13 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
     }
 
     if (_paused) {
-      await _tts.speak(_spokenArabic);
+      await _speak();
       return;
     }
 
     setState(() => _progress = 0);
     await _tts.stop();
-    await _tts.speak(_spokenArabic);
+    await _speak();
   }
 
   Future<void> _replay() async {
@@ -184,7 +194,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
       _paused = false;
       _speaking = false;
     });
-    await _tts.speak(_spokenArabic);
+    await _speak();
   }
 
   Future<void> _stopPlayback({bool resetProgress = false}) async {
@@ -208,6 +218,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     final active = _speaking;
 
     return Container(
@@ -217,18 +228,12 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.emerald.withValues(alpha: 0.45),
-            Colors.white.withValues(alpha: 0.05),
-            AppColors.night.withValues(alpha: 0.9),
-          ],
+          colors: p.playerGradient,
         ),
-        border: Border.all(
-          color: AppColors.gold.withValues(alpha: 0.28),
-        ),
+        border: Border.all(color: p.accent.withValues(alpha: 0.28)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.gold.withValues(alpha: active ? 0.14 : 0.05),
+            color: p.accent.withValues(alpha: active ? 0.14 : 0.05),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -243,14 +248,12 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.gold.withValues(alpha: 0.15),
-                  border: Border.all(
-                    color: AppColors.gold.withValues(alpha: 0.35),
-                  ),
+                  color: p.accent.withValues(alpha: 0.15),
+                  border: Border.all(color: p.accent.withValues(alpha: 0.35)),
                 ),
                 child: Icon(
                   Icons.graphic_eq_rounded,
-                  color: AppColors.goldSoft.withValues(alpha: 0.95),
+                  color: p.accentText.withValues(alpha: 0.95),
                   size: 20,
                 ),
               ),
@@ -262,7 +265,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
                     Text(
                       'Listen to this dua',
                       style: GoogleFonts.cormorantGaramond(
-                        color: AppColors.ivory,
+                        color: p.textPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         height: 1.1,
@@ -272,7 +275,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
                     Text(
                       'Speaks the Arabic on screen',
                       style: GoogleFonts.outfit(
-                        color: AppColors.mist,
+                        color: p.textSecondary,
                         fontSize: 12.5,
                       ),
                     ),
@@ -296,7 +299,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
               _error!,
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                color: AppColors.goldSoft.withValues(alpha: 0.9),
+                color: p.accentText.withValues(alpha: 0.9),
                 fontSize: 13,
               ),
             ),
@@ -306,7 +309,7 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
               child: Text(
                 'Try again',
                 style: GoogleFonts.outfit(
-                  color: AppColors.gold,
+                  color: p.accent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -317,15 +320,12 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
                 trackHeight: 3.5,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
-                activeTrackColor: AppColors.gold,
-                inactiveTrackColor: AppColors.gold.withValues(alpha: 0.18),
-                thumbColor: AppColors.goldSoft,
-                overlayColor: AppColors.gold.withValues(alpha: 0.18),
+                activeTrackColor: p.accent,
+                inactiveTrackColor: p.accent.withValues(alpha: 0.18),
+                thumbColor: p.accentText,
+                overlayColor: p.accent.withValues(alpha: 0.18),
               ),
-              child: Slider(
-                value: _progress,
-                onChanged: null,
-              ),
+              child: Slider(value: _progress, onChanged: null),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -337,14 +337,14 @@ class _DuaAudioPlayerState extends State<DuaAudioPlayer>
                         ? 'Playing on-screen Arabic'
                         : (_paused ? 'Paused' : 'Ready'),
                     style: GoogleFonts.outfit(
-                      color: AppColors.mist,
+                      color: p.textSecondary,
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     '${(_progress * 100).round()}%',
                     style: GoogleFonts.outfit(
-                      color: AppColors.mist,
+                      color: p.textSecondary,
                       fontSize: 12,
                     ),
                   ),
@@ -451,13 +451,14 @@ class _PlayerIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return IconButton(
       onPressed: onTap,
       icon: Icon(
         icon,
         color: onTap == null
-            ? AppColors.mist.withValues(alpha: 0.35)
-            : AppColors.goldSoft,
+            ? p.textSecondary.withValues(alpha: 0.35)
+            : p.accentText,
         size: 28,
       ),
     );
@@ -472,6 +473,7 @@ class _MiniWaveform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     const heights = [0.35, 0.7, 1.0, 0.55, 0.85, 0.45];
     return SizedBox(
       width: 42,
@@ -483,18 +485,19 @@ class _MiniWaveform extends StatelessWidget {
           for (var i = 0; i < heights.length; i++)
             Container(
               width: 3.5,
-              height: 22 *
+              height:
+                  22 *
                   (active
                       ? (0.28 +
-                          heights[i] *
-                              (0.45 +
-                                  0.55 *
-                                      ((math.sin((t * math.pi * 2) + i) + 1) /
-                                          2)))
+                            heights[i] *
+                                (0.45 +
+                                    0.55 *
+                                        ((math.sin((t * math.pi * 2) + i) + 1) /
+                                            2)))
                       : heights[i] * 0.45),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(99),
-                color: AppColors.gold.withValues(alpha: active ? 0.9 : 0.35),
+                color: p.accent.withValues(alpha: active ? 0.9 : 0.35),
               ),
             ),
         ],

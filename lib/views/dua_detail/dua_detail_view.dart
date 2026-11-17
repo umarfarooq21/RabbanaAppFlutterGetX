@@ -7,6 +7,8 @@ import '../../controllers/duas_controller.dart';
 import '../../controllers/favorites_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_palette.dart';
+import '../../theme/app_theme.dart';
 import 'widgets/dua_audio_player.dart';
 
 class DuaDetailView extends StatelessWidget {
@@ -14,6 +16,7 @@ class DuaDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     final duaId = Get.arguments as int;
     final duasController = Get.find<DuasController>();
     final favoritesController = Get.find<FavoritesController>();
@@ -21,8 +24,7 @@ class DuaDetailView extends StatelessWidget {
 
     return Obx(() {
       final dua = duasController.byId(duaId);
-      final isFavorite =
-          dua != null && favoritesController.isFavorite(dua.id);
+      final isFavorite = dua != null && favoritesController.isFavorite(dua.id);
       final fontScale = settingsController.fontScale.value;
       final showTransliteration = settingsController.showTransliteration.value;
       final showTranslation = settingsController.showTranslation.value;
@@ -33,34 +35,26 @@ class DuaDetailView extends StatelessWidget {
 
       if (dua == null) {
         return Scaffold(
-          backgroundColor: AppColors.nightDeep,
+          backgroundColor: p.background.last,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            foregroundColor: AppColors.ivory,
+            foregroundColor: p.textPrimary,
             leading: IconButton(
               onPressed: Get.back,
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
             ),
           ),
-          body: const Center(
-            child: Text('Dua not found'),
+          body: Center(
+            child: Text(
+              'Dua not found',
+              style: TextStyle(color: p.textPrimary),
+            ),
           ),
         );
       }
 
       return Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF0E3B30),
-                AppColors.night,
-                AppColors.nightDeep,
-              ],
-            ),
-          ),
+        body: AppBackground(
           child: SafeArea(
             child: Column(
               children: [
@@ -70,9 +64,9 @@ class DuaDetailView extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: Get.back,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back_ios_new_rounded,
-                          color: AppColors.ivory,
+                          color: p.textPrimary,
                           size: 20,
                         ),
                       ),
@@ -81,7 +75,7 @@ class DuaDetailView extends StatelessWidget {
                           'Rabbana ${dua.number}',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.cormorantGaramond(
-                            color: AppColors.ivory,
+                            color: p.textPrimary,
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
                           ),
@@ -93,7 +87,7 @@ class DuaDetailView extends StatelessWidget {
                           isFavorite
                               ? Icons.favorite_rounded
                               : Icons.favorite_border_rounded,
-                          color: isFavorite ? AppColors.gold : AppColors.mist,
+                          color: isFavorite ? p.accent : p.textSecondary,
                         ),
                       ),
                     ],
@@ -109,7 +103,7 @@ class DuaDetailView extends StatelessWidget {
                           dua.reference,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.outfit(
-                            color: AppColors.gold.withValues(alpha: 0.85),
+                            color: p.accent.withValues(alpha: 0.85),
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 0.3,
@@ -123,7 +117,7 @@ class DuaDetailView extends StatelessWidget {
                           textAlign: TextAlign.center,
                           textDirection: TextDirection.rtl,
                           style: GoogleFonts.amiri(
-                            color: AppColors.ivory,
+                            color: p.textPrimary,
                             fontSize: 30 * fontScale,
                             height: 1.8,
                             fontWeight: FontWeight.w700,
@@ -137,7 +131,7 @@ class DuaDetailView extends StatelessWidget {
                             dua.transliteration,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
-                              color: AppColors.goldSoft.withValues(alpha: 0.9),
+                              color: p.accentText.withValues(alpha: 0.9),
                               fontSize: 15.5 * fontScale,
                               height: 1.55,
                               fontStyle: FontStyle.italic,
@@ -152,7 +146,7 @@ class DuaDetailView extends StatelessWidget {
                             dua.translation,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
-                              color: AppColors.mist,
+                              color: p.textSecondary,
                               fontSize: 16 * fontScale,
                               height: 1.6,
                             ),
@@ -183,15 +177,15 @@ class DuaDetailView extends StatelessWidget {
                                 duration: const Duration(seconds: 2),
                               );
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.copy_rounded,
-                              color: AppColors.goldSoft,
+                              color: p.accentText,
                               size: 18,
                             ),
                             label: Text(
                               'Copy dua',
                               style: GoogleFonts.outfit(
-                                color: AppColors.goldSoft,
+                                color: p.accentText,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -217,11 +211,12 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Text(
       text.toUpperCase(),
       textAlign: TextAlign.center,
       style: GoogleFonts.outfit(
-        color: AppColors.gold.withValues(alpha: 0.65),
+        color: p.accent.withValues(alpha: 0.65),
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 1.4,

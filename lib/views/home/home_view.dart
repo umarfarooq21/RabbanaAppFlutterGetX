@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../controllers/duas_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../models/rabbana_dua.dart';
-import '../../theme/app_colors.dart';
+import '../../theme/app_palette.dart';
+import '../../theme/app_theme.dart';
 import 'widgets/dua_list_card.dart';
 import 'widgets/home_header.dart';
 
@@ -15,29 +15,9 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: AppColors.nightDeep,
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
-    );
-
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0E3B30),
-              AppColors.night,
-              AppColors.nightDeep,
-            ],
-            stops: [0.0, 0.35, 1.0],
-          ),
-        ),
+      body: AppBackground(
+        stops: const [0.0, 0.35, 1.0],
         child: SafeArea(
           bottom: false,
           child: Column(
@@ -78,8 +58,7 @@ class HomeView extends GetView<HomeController> {
                         trailing: controller.favoritesController.count > 0
                             ? '${controller.favoritesController.count}'
                             : null,
-                        onTap: () =>
-                            controller.setFilter(HomeFilter.favorites),
+                        onTap: () => controller.setFilter(HomeFilter.favorites),
                       ),
                     ],
                   ),
@@ -122,54 +101,48 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      style: GoogleFonts.outfit(
-        color: AppColors.ivory,
-        fontSize: 15,
-      ),
-      cursorColor: AppColors.gold,
+      style: GoogleFonts.outfit(color: p.textPrimary, fontSize: 15),
+      cursorColor: p.accent,
       decoration: InputDecoration(
         hintText: 'Search by meaning, number, or surah…',
         hintStyle: GoogleFonts.outfit(
-          color: AppColors.mist.withValues(alpha: 0.55),
+          color: p.textSecondary.withValues(alpha: 0.55),
           fontSize: 14,
         ),
         prefixIcon: Icon(
           Icons.search_rounded,
-          color: AppColors.gold.withValues(alpha: 0.85),
+          color: p.accent.withValues(alpha: 0.85),
         ),
         suffixIcon: hasText
             ? IconButton(
                 onPressed: onClear,
                 icon: Icon(
                   Icons.close_rounded,
-                  color: AppColors.mist.withValues(alpha: 0.7),
+                  color: p.textSecondary.withValues(alpha: 0.7),
                 ),
               )
             : null,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.06),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: p.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(
-            color: AppColors.gold.withValues(alpha: 0.18),
-          ),
+          borderSide: BorderSide(color: p.accent.withValues(alpha: 0.18)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(
-            color: AppColors.gold.withValues(alpha: 0.18),
-          ),
+          borderSide: BorderSide(color: p.accent.withValues(alpha: 0.18)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
-          borderSide: BorderSide(
-            color: AppColors.gold.withValues(alpha: 0.55),
-          ),
+          borderSide: BorderSide(color: p.accent.withValues(alpha: 0.55)),
         ),
       ),
     );
@@ -191,6 +164,7 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -202,13 +176,11 @@ class _FilterChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
-            color: selected
-                ? AppColors.gold.withValues(alpha: 0.18)
-                : Colors.white.withValues(alpha: 0.05),
+            color: selected ? p.accent.withValues(alpha: 0.18) : p.surface,
             border: Border.all(
               color: selected
-                  ? AppColors.gold.withValues(alpha: 0.55)
-                  : AppColors.gold.withValues(alpha: 0.14),
+                  ? p.accent.withValues(alpha: 0.55)
+                  : p.accent.withValues(alpha: 0.14),
             ),
           ),
           child: Row(
@@ -217,7 +189,7 @@ class _FilterChip extends StatelessWidget {
               Text(
                 label,
                 style: GoogleFonts.outfit(
-                  color: selected ? AppColors.goldSoft : AppColors.mist,
+                  color: selected ? p.accentText : p.textSecondary,
                   fontSize: 13.5,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
@@ -225,16 +197,18 @@ class _FilterChip extends StatelessWidget {
               if (trailing != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.gold.withValues(alpha: 0.2),
+                    color: p.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     trailing!,
                     style: GoogleFonts.outfit(
-                      color: AppColors.goldSoft,
+                      color: p.accentText,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
@@ -268,10 +242,9 @@ class _HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     if (duasController.isLoading && !duasController.hasData) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.gold),
-      );
+      return Center(child: CircularProgressIndicator(color: p.accent));
     }
 
     if (duasController.state.value == DuasLoadState.error &&
@@ -300,12 +273,10 @@ class _HomeBody extends StatelessWidget {
       itemBuilder: (context, index) {
         final dua = visible[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: index == visible.length - 1 ? 0 : 12),
-          child: DuaListCard(
-            dua: dua,
-            index: index,
-            onTap: () => onOpen(dua),
+          padding: EdgeInsets.only(
+            bottom: index == visible.length - 1 ? 0 : 12,
           ),
+          child: DuaListCard(dua: dua, index: index, onTap: () => onOpen(dua)),
         );
       },
     );
@@ -327,6 +298,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -336,14 +308,14 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.menu_book_rounded,
               size: 42,
-              color: AppColors.gold.withValues(alpha: 0.55),
+              color: p.accent.withValues(alpha: 0.55),
             ),
             const SizedBox(height: 16),
             Text(
               title,
               textAlign: TextAlign.center,
               style: GoogleFonts.cormorantGaramond(
-                color: AppColors.ivory,
+                color: p.textPrimary,
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
               ),
@@ -353,7 +325,7 @@ class _EmptyState extends StatelessWidget {
               subtitle,
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                color: AppColors.mist,
+                color: p.textSecondary,
                 fontSize: 14,
                 height: 1.45,
               ),
@@ -365,7 +337,7 @@ class _EmptyState extends StatelessWidget {
                 child: Text(
                   actionLabel!,
                   style: GoogleFonts.outfit(
-                    color: AppColors.goldSoft,
+                    color: p.accentText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

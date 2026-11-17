@@ -62,6 +62,7 @@ class DuasController extends GetxController {
       errorMessage.value = 'Unable to load Rabbana duas.';
       duas.clear();
       state.value = DuasLoadState.error;
+      
     }
   }
 }
